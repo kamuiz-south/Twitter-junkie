@@ -1,0 +1,279 @@
+/* 
+   Twitter Junkie - Modern Glassmorphism UI Styles 
+*/
+:root {
+  --tj-bg-color: rgba(21, 32, 43, 0.75); /* matches Twitter dark dim */
+  --tj-border-color: rgba(255, 255, 255, 0.15);
+  --tj-text-color: #ffffff;
+  --tj-primary-color: #1d9bf0; /* Twitter blue */
+  --tj-hover-bg: rgba(255, 255, 255, 0.1);
+  --tj-active-bg: rgba(29, 155, 240, 0.2);
+  --tj-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --tj-blur: blur(12px);
+  --tj-border-radius: 16px;
+  --tj-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Panel */
+#tj-auto-scroll-panel {
+  position: fixed !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  box-sizing: border-box !important;
+  background: var(--tj-bg-color) !important;
+  backdrop-filter: var(--tj-blur) !important;
+  -webkit-backdrop-filter: var(--tj-blur) !important;
+  border: 1px solid var(--tj-border-color) !important;
+  border-radius: var(--tj-border-radius) !important;
+  box-shadow: var(--tj-shadow) !important;
+  color: var(--tj-text-color) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  user-select: none !important;
+  cursor: grab !important;
+  transition: opacity 0.3s ease !important;
+  opacity: 0.9 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+#tj-auto-scroll-panel:hover {
+  opacity: 1;
+}
+
+#tj-auto-scroll-panel:active {
+  cursor: grabbing;
+}
+
+/* Header / Title */
+.tj-panel-header {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--tj-text-color);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+
+/* Control Buttons Container */
+.tj-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 4px;
+}
+
+/* Individual Buttons */
+.tj-btn {
+  background: transparent;
+  border: none;
+  color: var(--tj-text-color);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--tj-transition);
+}
+
+.tj-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.tj-btn:hover {
+  background: var(--tj-hover-bg);
+}
+
+.tj-btn.active {
+  color: var(--tj-primary-color);
+  background: var(--tj-active-bg);
+}
+
+/* Speed Slider Container */
+.tj-speed-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tj-speed-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tj-speed-adjust-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: var(--tj-transition);
+}
+
+.tj-speed-adjust-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tj-speed-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Custom Range Slider */
+.tj-slider {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 2px !important;
+  outline: none !important;
+  transition: var(--tj-transition) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.tj-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tj-primary-color);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(29, 155, 240, 0.5);
+  transition: transform 0.1s;
+}
+
+.tj-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* =========================================
+   In-Place Video Maximization
+   ========================================= */
+
+/* The button injected onto videos */
+.tj-video-maximize-btn {
+  position: absolute !important;
+  z-index: 100 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: grab !important;
+  transition: background-color 0.2s, transform 0.2s, opacity 0.2s !important;
+  opacity: 0 !important; 
+}
+
+/* Show button on video container hover, OR when the fullscreen wrapper is hovered */
+div[data-testid="videoPlayer"]:hover .tj-video-maximize-btn,
+.tj-max-overlay-wrapper:hover .tj-video-maximize-btn,
+.tj-video-maximize-btn:focus {
+  opacity: 1 !important;
+}
+
+.tj-video-maximize-btn:hover {
+  background: rgba(0, 0, 0, 0.8) !important;
+  transform: scale(1.05) !important;
+}
+
+.tj-video-maximize-btn:active {
+  cursor: grabbing !important;
+}
+
+.tj-video-maximize-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: currentColor !important;
+}
+
+/* 
+  Extracted Video Overlay Wrapper
+*/
+.tj-max-overlay-wrapper {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  pointer-events: none !important; /* Let clicks pass to backdrop */
+}
+
+/* Re-enable interactions for video and button inside wrapper */
+.tj-max-overlay-wrapper video {
+  pointer-events: auto !important;
+  z-index: 9999999 !important; /* Base video */
+  margin: auto !important; /* Flex centering fallback */
+  position: static !important; /* OVERRIDE X.com inline absolute */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+/* Force the button to stay on top of the fullscreen video */
+.tj-max-overlay-wrapper .tj-video-maximize-btn {
+  pointer-events: auto !important;
+  z-index: 10000000 !important; /* 1 higher than the video itself */
+  position: absolute !important; /* override relative/transforms */
+}
+
+/* Full Screen Mode */
+.tj-mode-width video {
+  width: 100vw !important;
+  height: auto !important;
+  max-height: 100vh !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  z-index: 9999999 !important;
+}
+
+/* A backdrop when video is maximized to dim the rest of the site */
+.tj-video-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 999998 !important; /* One less than video's 999999 */
+  display: none !important;
+}
+.tj-video-backdrop.active {
+  display: block !important;
+}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Twitter Junkie Options</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #15202B; /* X.com dim */
+            color: #ffffff;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 16px;
+        }
+        .section {
+            margin-bottom: 32px;
+        }
+        .section h2 {
+            font-size: 16px;
+            color: #1d9bf0;
+            margin-bottom: 16px;
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .setting-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .setting-row label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .setting-row.flex-between {
+            justify-content: space-between;
+        }
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        input[type="number"] {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 60px;
+            font-size: 14px;
+        }
+        .description {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-left: 30px;
+            margin-top: -8px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        .help-text {
+            background: rgba(29, 155, 240, 0.1);
+            border-left: 3px solid #1d9bf0;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 16px;
+        }
+        .keybind-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            min-width: 120px;
+            text-align: center;
+        }
+        .keybind-btn.recording {
+            background: #1d9bf0;
+            border-color: #1d9bf0;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 data-i18n="optTitle">Twitter Junkie Settings</h1>
+        
+        <div class="section">
+            <h2 data-i18n="uiSection">User Interface</h2>
+            
+            <div class="setting-row flex-between" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 24px;">
+                <span data-i18n="optLanguage">Language / 言語</span>
+                <select id="opt-language" style="background: #15202B; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                    <option value="en">English</option>
+                    <option value="jp">日本語</option>
+                </select>
+            </div>
+            
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-drag-video">
+                    <span data-i18n="optDrag">Enable Video Drag & Drop</span>
+                </label>
+            </div>
+            <div class="description" data-i18n="descDrag">
+                Allows clicking and dragging the video maximize button.
+            </div>
+
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-hide-ui-always">
+                    <span data-i18n="optHideAlways">Always Hide Auto-Scroll UI</span>
+                </label>
+            </div>
+            <div class="description" data-i18n="descHideAlways">
+                Permanently hides the floating UI panel. Shortcuts will still function.
+            </div>
+
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-theater-hide">
+                    <span data-i18n="optTheater">Auto-Hide Scroll Panel in Theater Mode</span>
+                </label>
+            </div>
+            <div class="description" data-i18n="descTheater">
+                Hides the floating Auto-Scroll panel completely when viewing fullscreen photos or videos.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 data-i18n="advSection">Advanced Shortcuts</h2>
+            
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-shortcuts-enabled">
+                    <span data-i18n="optShortcuts">Enable Mouse/Keyboard Shortcuts for Auto-Scroll</span>
+                </label>
+            </div>
+            
+            <div class="help-text" style="margin-bottom: 24px;" data-i18n="helpShortcuts">
+                <strong>Control Scheme:</strong><br>
+                • <code>Right-Click (Hold) + Mouse Wheel</code> : Starts scrolling in the wheel direction.<br>
+                • While holding the initial Right-Click, scrolling the wheel the other way changes direction.<br>
+                • Releasing Right-Click, then <strong>holding Right-Click + Wheel again</strong> adjusts Speed.<br>
+                • <code>Left-Click</code> OR <code>Spacebar</code> : Stops scrolling.
+            </div>
+
+            <div class="setting-row flex-between">
+                <span data-i18n="optSpeedStep">Speed Adjustment Step (Default: 0.2)</span>
+                <input type="number" id="opt-speed-step" min="0.1" max="10.0" step="0.1" value="0.2">
+            </div>
+
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-intuitive-wheel">
+                    <span data-i18n="optIntuitive">Intuitive Wheel Operation Mode</span>
+                </label>
+            </div>
+            <div class="description" style="margin-left:0; margin-bottom: 24px;" data-i18n="descIntuitive">
+                Right-Click + Wheel directly controls scrolling direction and speed as a single momentum counter across both directions.
+            </div>
+
+            <div class="setting-row">
+                <label>
+                    <input type="checkbox" id="opt-reverse-wheel">
+                    <span data-i18n="optReverse">Reverse Wheel Direction when scrolling Downwards</span>
+                </label>
+            </div>
+            <div class="description" style="margin-left:0; margin-bottom: 24px;" data-i18n="descReverse">
+                When already scrolling down, scrolling the wheel down speeds up, and up slows down.
+            </div>
+            
+            <div class="setting-row flex-between">
+                <span data-i18n="kbStartUp">Start Scrolling UP</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="kb-startup" class="keybind-btn">None</button>
+                    <button title="Clear Bind" class="keybind-btn btn-clear-bind" data-target="kb-startup" style="min-width:auto; padding:4px 8px;">X</button>
+                </div>
+            </div>
+
+            <div class="setting-row flex-between">
+                <span data-i18n="kbStartDown">Start Scrolling DOWN</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="kb-startdown" class="keybind-btn">None</button>
+                    <button title="Clear Bind" class="keybind-btn btn-clear-bind" data-target="kb-startdown" style="min-width:auto; padding:4px 8px;">X</button>
+                </div>
+            </div>
+
+            <div class="setting-row flex-between">
+                <span data-i18n="kbSpeedUp">Speed UP (Faster)</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="kb-speedup" class="keybind-btn">None</button>
+                    <button title="Clear Bind" class="keybind-btn btn-clear-bind" data-target="kb-speedup" style="min-width:auto; padding:4px 8px;">X</button>
+                </div>
+            </div>
+
+            <div class="setting-row flex-between">
+                <span data-i18n="kbSpeedDown">Speed DOWN (Slower)</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="kb-speeddown" class="keybind-btn">None</button>
+                    <button title="Clear Bind" class="keybind-btn btn-clear-bind" data-target="kb-speeddown" style="min-width:auto; padding:4px 8px;">X</button>
+                </div>
+            </div>
+            
+            <div class="setting-row flex-between">
+                <span data-i18n="kbStop">Stop Scrolling</span>
+                <div style="display:flex; gap:8px;">
+                    <button id="kb-stop" class="keybind-btn">Space</button>
+                    <button title="Clear Bind" class="keybind-btn btn-clear-bind" data-target="kb-stop" style="min-width:auto; padding:4px 8px;">X</button>
+                </div>
+            </div>
+            <div class="description" style="margin-left:0;" data-i18n="descRebind">
+                Click any button to rebind. Left-click anywhere on the page will always stop scrolling.
+            </div>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>
