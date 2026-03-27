@@ -646,9 +646,15 @@
             
             viewState = 0;
             
-            // Restore Auto-Scroll UI
+            // Restore Auto-Scroll UI according to settings
             const autoScrollPanel = document.getElementById('tj-auto-scroll-panel');
-            if (autoScrollPanel) autoScrollPanel.style.display = 'flex';
+            if (autoScrollPanel) {
+                if (globalHideUIAlways) {
+                    autoScrollPanel.style.setProperty('display', 'none', 'important');
+                } else {
+                    autoScrollPanel.style.setProperty('display', 'flex', 'important');
+                }
+            }
             
             // Clear the active restorer if this was the one
             currentRestoreMaximized = null;
