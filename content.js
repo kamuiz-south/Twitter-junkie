@@ -16,6 +16,7 @@
     const KEY_SPEED_STEP = 'tj_speed_step';
     const KEY_INTUITIVE_WHEEL = 'tj_intuitive_wheel';
     const KEY_REVERSE_WHEEL = 'tj_reverse_wheel';
+    const KEY_SPEED_MAX = 'tj_speed_max';
     const KEY_STOP_BIND = 'tj_stop_bind';
     const KEY_START_UP = 'tj_start_up';
     const KEY_START_DOWN = 'tj_start_down';
@@ -31,6 +32,7 @@
     let globalLanguage = 'jp';
     let globalShortcutsEnabled = true;
     let globalSpeedStep = 0.2;
+    let globalSpeedMax = 25;
     let globalIntuitiveWheel = false;
     let globalReverseWheel = false;
     let globalStopBind = 'Space';
@@ -103,7 +105,7 @@
                         <button id="tj-speed-minus-plus" class="tj-speed-adjust-btn">+</button>
                     </div>
                 </div>
-                <input type="range" id="tj-speed-slider" class="tj-slider" min="0.1" max="25" step="0.1" value="${autoScrollSpeed}">
+                <input type="range" id="tj-speed-slider" class="tj-slider" min="0.1" max="${globalSpeedMax}" step="0.1" value="${autoScrollSpeed}">
             </div>
         `;
         document.body.appendChild(panel);
@@ -132,7 +134,7 @@
         btnDown.addEventListener('click', () => setScrollDirection(1));
 
         function setSpeed(newSpeed) {
-            autoScrollSpeed = Math.max(0.1, Math.min(25, newSpeed));
+            autoScrollSpeed = Math.max(0.1, Math.min(globalSpeedMax, newSpeed));
             speedValDisp.textContent = autoScrollSpeed.toFixed(1);
             speedSlider.value = autoScrollSpeed;
             chrome.storage.local.set({ [STORAGE_SPEED_KEY]: autoScrollSpeed });
@@ -199,8 +201,17 @@
     function restoreUIPosition(panel) {
         chrome.storage.local.get([STORAGE_POSITION_KEY], (result) => {
             if (result[STORAGE_POSITION_KEY]) {
-                panel.style.left = result[STORAGE_POSITION_KEY].left || '20px';
-                panel.style.top = result[STORAGE_POSITION_KEY].top || '100px';
+                let left = parseInt(result[STORAGE_POSITION_KEY].left, 10) || 20;
+                let top = parseInt(result[STORAGE_POSITION_KEY].top, 10) || 100;
+                
+                // Clamp to current viewport so the panel is never off-screen
+                const maxX = window.innerWidth - panel.offsetWidth;
+                const maxY = window.innerHeight - panel.offsetHeight;
+                left = Math.max(0, Math.min(left, maxX));
+                top = Math.max(0, Math.min(top, maxY));
+                
+                panel.style.left = `${left}px`;
+                panel.style.top = `${top}px`;
                 panel.style.bottom = 'auto';
                 panel.style.right = 'auto';
             } else {
@@ -210,6 +221,34 @@
             }
         });
     }
+
+    // Re-clamp panel position whenever the window is resized
+    window.addEventListener('resize', () => {
+        const panel = document.getElementById('tj-auto-scroll-panel');
+        if (!panel || isDragging) return;
+        
+        // Only clamp if the panel is using left/top positioning (i.e. has been dragged before)
+        if (panel.style.left && panel.style.left !== 'auto') {
+            let left = parseInt(panel.style.left, 10);
+            let top = parseInt(panel.style.top, 10);
+            const maxX = window.innerWidth - panel.offsetWidth;
+            const maxY = window.innerHeight - panel.offsetHeight;
+            
+            if (left > maxX || top > maxY || left < 0 || top < 0) {
+                left = Math.max(0, Math.min(left, maxX));
+                top = Math.max(0, Math.min(top, maxY));
+                panel.style.left = `${left}px`;
+                panel.style.top = `${top}px`;
+                
+                chrome.storage.local.set({
+                    [STORAGE_POSITION_KEY]: {
+                        left: panel.style.left,
+                        top: panel.style.top
+                    }
+                });
+            }
+        }
+    });
 
     function restoreSpeed() {
         chrome.storage.local.get([STORAGE_SPEED_KEY], (result) => {
@@ -852,7 +891,7 @@
         createAutoScrollUI();
         
         chrome.storage.local.get([
-            KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
+            KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
             KEY_STOP_BIND, KEY_START_UP, KEY_START_DOWN, KEY_SPEED_UP, KEY_SPEED_DOWN
         ], (res) => {
              globalDragEnabled = res[KEY_DRAG] || false;
@@ -861,6 +900,10 @@
              globalLanguage = res[KEY_LANGUAGE] || 'jp';
              globalShortcutsEnabled = res[KEY_SHORTCUTS] !== undefined ? res[KEY_SHORTCUTS] : true;
              globalSpeedStep = res[KEY_SPEED_STEP] !== undefined ? res[KEY_SPEED_STEP] : 0.2;
+             globalSpeedMax = res[KEY_SPEED_MAX] !== undefined ? res[KEY_SPEED_MAX] : 25;
+             // Update slider max attribute
+             const slider = document.getElementById('tj-speed-slider');
+             if (slider) slider.max = globalSpeedMax;
              globalIntuitiveWheel = res[KEY_INTUITIVE_WHEEL] || false;
              globalReverseWheel = res[KEY_REVERSE_WHEEL] || false;
              globalStopBind = res[KEY_STOP_BIND] || 'Space';
@@ -900,6 +943,11 @@
                  }
                  if (changes[KEY_SHORTCUTS]) globalShortcutsEnabled = changes[KEY_SHORTCUTS].newValue;
                  if (changes[KEY_SPEED_STEP]) globalSpeedStep = changes[KEY_SPEED_STEP].newValue;
+                 if (changes[KEY_SPEED_MAX]) {
+                     globalSpeedMax = changes[KEY_SPEED_MAX].newValue;
+                     const slider = document.getElementById('tj-speed-slider');
+                     if (slider) slider.max = globalSpeedMax;
+                 }
                  if (changes[KEY_INTUITIVE_WHEEL]) globalIntuitiveWheel = changes[KEY_INTUITIVE_WHEEL].newValue;
                  if (changes[KEY_REVERSE_WHEEL]) globalReverseWheel = changes[KEY_REVERSE_WHEEL].newValue;
                  if (changes[KEY_STOP_BIND]) globalStopBind = changes[KEY_STOP_BIND].newValue;

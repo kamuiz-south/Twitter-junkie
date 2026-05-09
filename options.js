@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const KEY_LANGUAGE = 'tj_language';
     const KEY_SHORTCUTS = 'tj_shortcuts_enabled';
     const KEY_SPEED_STEP = 'tj_speed_step';
+    const KEY_SPEED_MAX = 'tj_speed_max';
     const KEY_INTUITIVE_WHEEL = 'tj_intuitive_wheel';
     const KEY_REVERSE_WHEEL = 'tj_reverse_wheel';
     const KEY_STOP_BIND = 'tj_stop_bind';
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             optShortcuts: 'Enable Mouse/Keyboard Shortcuts for Auto-Scroll',
             helpShortcuts: '<strong>Control Scheme:</strong><br>• <code>Right-Click (Hold) + Mouse Wheel</code> : Starts scrolling in the wheel direction.<br>• While holding the initial Right-Click, scrolling the wheel the other way changes direction.<br>• Releasing Right-Click, then <strong>holding Right-Click + Wheel again</strong> adjusts Speed.<br>• <code>Left-Click</code> OR <code>Spacebar</code> : Stops scrolling.',
             optSpeedStep: 'Speed Adjustment Step (Default: 0.2)',
+            optSpeedMax: 'Max Speed (Default: 25)',
             optIntuitive: 'Intuitive Wheel Operation Mode',
             descIntuitive: 'Right-Click + Wheel directly controls scrolling direction and speed as a single momentum counter across both directions.',
             optReverse: 'Reverse Wheel Direction when scrolling Downwards',
@@ -55,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             optShortcuts: '自動スクロール機能のショートカットを有効にする',
             helpShortcuts: '<strong>操作方法:</strong><br>• <code>右クリック（長押し） + マウスホイール</code> : ホイールの方向にスクロールを開始します。<br>• 右クリックを押下したまま、ホイールを逆方向に回すと方向が反転します。<br>• 右クリックを離し、再度<strong>右クリック + ホイール</strong>で速度の調整が可能です。<br>• <code>左クリック</code> または <code>Spaceキー</code> : スクロールを停止します。',
             optSpeedStep: '速度調整のステップ（デフォルト: 0.2）',
+            optSpeedMax: '最大速度（デフォルト: 25）',
             optIntuitive: '直感的なホイール操作モード',
             descIntuitive: '右クリック＋ホイールで、速度と方向を1つの連続したカウンターとしてシームレスに操作できます。',
             optReverse: '下方向スクロール中のホイール操作を逆転する',
@@ -83,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selLanguage = document.getElementById('opt-language');
     const chkShortcuts = document.getElementById('opt-shortcuts-enabled');
     const inputSpeedStep = document.getElementById('opt-speed-step');
+    const inputSpeedMax = document.getElementById('opt-speed-max');
     const chkIntuitiveWheel = document.getElementById('opt-intuitive-wheel');
     const chkReverseWheel = document.getElementById('opt-reverse-wheel');
     
@@ -94,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load states
     chrome.storage.local.get([
-        KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
+        KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
         KEY_STOP_BIND, KEY_START_UP, KEY_START_DOWN, KEY_SPEED_UP, KEY_SPEED_DOWN
     ], (res) => {
         const lang = res[KEY_LANGUAGE] || 'jp'; // Default to Japanese per user persona context
@@ -106,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chkHideUIAlways.checked = res[KEY_HIDE_UI_ALWAYS] || false;
         chkShortcuts.checked = res[KEY_SHORTCUTS] !== undefined ? res[KEY_SHORTCUTS] : true; // Default ON
         inputSpeedStep.value = res[KEY_SPEED_STEP] !== undefined ? res[KEY_SPEED_STEP] : 0.2;
+        inputSpeedMax.value = res[KEY_SPEED_MAX] !== undefined ? res[KEY_SPEED_MAX] : 25;
         chkIntuitiveWheel.checked = res[KEY_INTUITIVE_WHEEL] || false;
         chkReverseWheel.checked = res[KEY_REVERSE_WHEEL] || false;
         
@@ -142,6 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let val = parseFloat(e.target.value);
         if (isNaN(val) || val <= 0) val = 0.2;
         chrome.storage.local.set({ [KEY_SPEED_STEP]: val });
+    });
+
+    // Save Max Speed
+    inputSpeedMax.addEventListener('change', (e) => {
+        let val = parseFloat(e.target.value);
+        if (isNaN(val) || val < 1) val = 25;
+        chrome.storage.local.set({ [KEY_SPEED_MAX]: val });
     });
 
     // Handle Keybind Recording
