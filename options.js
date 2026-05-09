@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const KEY_SHORTCUTS = 'tj_shortcuts_enabled';
     const KEY_SPEED_STEP = 'tj_speed_step';
     const KEY_SPEED_MAX = 'tj_speed_max';
+    const KEY_EXCLUDED_URLS = 'tj_excluded_urls';
     const KEY_INTUITIVE_WHEEL = 'tj_intuitive_wheel';
     const KEY_REVERSE_WHEEL = 'tj_reverse_wheel';
     const KEY_STOP_BIND = 'tj_stop_bind';
@@ -27,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
             descHideAlways: 'Permanently hides the floating UI panel. Shortcuts will still function.',
             optTheater: 'Auto-Hide Scroll Panel in Theater Mode',
             descTheater: 'Hides the floating Auto-Scroll panel completely when viewing fullscreen photos or videos.',
+            optExcludedUrls: 'Excluded URLs (one per line)',
+            descExcludedUrls: 'The extension will be disabled on pages whose URL starts with any of the listed URLs.',
             advSection: 'Advanced Shortcuts',
             optShortcuts: 'Enable Mouse/Keyboard Shortcuts for Auto-Scroll',
             helpShortcuts: '<strong>Control Scheme:</strong><br>• <code>Right-Click (Hold) + Mouse Wheel</code> : Starts scrolling in the wheel direction.<br>• While holding the initial Right-Click, scrolling the wheel the other way changes direction.<br>• Releasing Right-Click, then <strong>holding Right-Click + Wheel again</strong> adjusts Speed.<br>• <code>Left-Click</code> OR <code>Spacebar</code> : Stops scrolling.',
@@ -53,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
             descHideAlways: 'フローティングUIパネルを完全に非表示にします。ショートカットは引き続き機能します。',
             optTheater: 'シアターモードでスクロールパネルを自動非表示',
             descTheater: '全画面で画像や動画を表示する際、パネルを自動的に非表示にします。',
+            optExcludedUrls: '無効化URL（改行で複数指定）',
+            descExcludedUrls: '指定したURLで始まるページでは拡張機能が無効になります。',
             advSection: '詳細ショートカット設定',
             optShortcuts: '自動スクロール機能のショートカットを有効にする',
             helpShortcuts: '<strong>操作方法:</strong><br>• <code>右クリック（長押し） + マウスホイール</code> : ホイールの方向にスクロールを開始します。<br>• 右クリックを押下したまま、ホイールを逆方向に回すと方向が反転します。<br>• 右クリックを離し、再度<strong>右クリック + ホイール</strong>で速度の調整が可能です。<br>• <code>左クリック</code> または <code>Spaceキー</code> : スクロールを停止します。',
@@ -87,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chkShortcuts = document.getElementById('opt-shortcuts-enabled');
     const inputSpeedStep = document.getElementById('opt-speed-step');
     const inputSpeedMax = document.getElementById('opt-speed-max');
+    const txtExcludedUrls = document.getElementById('opt-excluded-urls');
     const chkIntuitiveWheel = document.getElementById('opt-intuitive-wheel');
     const chkReverseWheel = document.getElementById('opt-reverse-wheel');
     
@@ -98,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load states
     chrome.storage.local.get([
-        KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
+        KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_EXCLUDED_URLS, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
         KEY_STOP_BIND, KEY_START_UP, KEY_START_DOWN, KEY_SPEED_UP, KEY_SPEED_DOWN
     ], (res) => {
         const lang = res[KEY_LANGUAGE] || 'jp'; // Default to Japanese per user persona context
@@ -108,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chkDrag.checked = res[KEY_DRAG] || false;
         chkTheater.checked = res[KEY_THEATER] !== undefined ? res[KEY_THEATER] : true; // Default ON
         chkHideUIAlways.checked = res[KEY_HIDE_UI_ALWAYS] || false;
+        txtExcludedUrls.value = (res[KEY_EXCLUDED_URLS] || []).join('\n');
         chkShortcuts.checked = res[KEY_SHORTCUTS] !== undefined ? res[KEY_SHORTCUTS] : true; // Default ON
         inputSpeedStep.value = res[KEY_SPEED_STEP] !== undefined ? res[KEY_SPEED_STEP] : 0.2;
         inputSpeedMax.value = res[KEY_SPEED_MAX] !== undefined ? res[KEY_SPEED_MAX] : 25;
@@ -154,6 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let val = parseFloat(e.target.value);
         if (isNaN(val) || val < 1) val = 25;
         chrome.storage.local.set({ [KEY_SPEED_MAX]: val });
+    });
+
+    // Save Excluded URLs
+    txtExcludedUrls.addEventListener('input', () => {
+        const lines = txtExcludedUrls.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        chrome.storage.local.set({ [KEY_EXCLUDED_URLS]: lines });
     });
 
     // Handle Keybind Recording

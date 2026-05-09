@@ -24,6 +24,7 @@
     const KEY_SPEED_DOWN = 'tj_speed_down';
     const KEY_HIDE_UI_ALWAYS = 'tj_hide_ui_always';
     const KEY_LANGUAGE = 'tj_language';
+    const KEY_EXCLUDED_URLS = 'tj_excluded_urls';
     
     // Feature Toggles (default to ON except drag)
     let globalDragEnabled = false; 
@@ -40,6 +41,12 @@
     let globalStartDownBind = 'None';
     let globalSpeedUpBind = 'None';
     let globalSpeedDownBind = 'None';
+    let globalExcludedUrls = [];
+
+    function isUrlExcluded() {
+        const url = window.location.href;
+        return globalExcludedUrls.some(pattern => url.startsWith(pattern));
+    }
 
     const CONTENT_I18N = {
          en: { panelHeader: 'Auto Scroll', speedLabel: 'Speed' },
@@ -891,9 +898,10 @@
         createAutoScrollUI();
         
         chrome.storage.local.get([
-            KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
+            KEY_DRAG, KEY_THEATER, KEY_HIDE_UI_ALWAYS, KEY_LANGUAGE, KEY_EXCLUDED_URLS, KEY_SHORTCUTS, KEY_SPEED_STEP, KEY_SPEED_MAX, KEY_INTUITIVE_WHEEL, KEY_REVERSE_WHEEL,
             KEY_STOP_BIND, KEY_START_UP, KEY_START_DOWN, KEY_SPEED_UP, KEY_SPEED_DOWN
         ], (res) => {
+             globalExcludedUrls = res[KEY_EXCLUDED_URLS] || [];
              globalDragEnabled = res[KEY_DRAG] || false;
              globalTheaterHideEnabled = res[KEY_THEATER] !== undefined ? res[KEY_THEATER] : true;
              globalHideUIAlways = res[KEY_HIDE_UI_ALWAYS] || false;
@@ -955,6 +963,7 @@
                  if (changes[KEY_START_DOWN]) globalStartDownBind = changes[KEY_START_DOWN].newValue;
                  if (changes[KEY_SPEED_UP]) globalSpeedUpBind = changes[KEY_SPEED_UP].newValue;
                  if (changes[KEY_SPEED_DOWN]) globalSpeedDownBind = changes[KEY_SPEED_DOWN].newValue;
+                 if (changes[KEY_EXCLUDED_URLS]) globalExcludedUrls = changes[KEY_EXCLUDED_URLS].newValue || [];
             }
         });
         
@@ -978,6 +987,19 @@
         function checkTheaterMode() {
             const panel = document.getElementById('tj-auto-scroll-panel');
             if (!panel) return;
+            
+            // Check excluded URLs - hide everything if on excluded page
+            if (isUrlExcluded()) {
+                 if (lastTheaterState !== 'excluded') {
+                      panel.style.setProperty('display', 'none', 'important');
+                      if (autoScrollDirection !== 0) setScrollDirection(0);
+                      lastTheaterState = 'excluded';
+                 }
+                 return;
+            } else if (lastTheaterState === 'excluded') {
+                 // Recover from excluded state
+                 lastTheaterState = null;
+            }
             
             if (globalHideUIAlways) {
                  if (lastTheaterState !== 'hidden_always') {
